@@ -49,7 +49,7 @@ def execute_python_code():
         # 임시 파일 삭제
         os.remove(temp_file_path)
 
-    return jsonify([result])
+    return jsonify(result)
 
 @app.route('/execute/java', methods=['POST'])
 def execute_java_code():
@@ -105,7 +105,7 @@ def execute_java_code():
     finally:
         shutil.rmtree(dir_path)  # 작업 완료 후 디렉터리 정리
 
-    return jsonify([result])
+    return jsonify(result)
 
 
 if __name__ == '__main__':
