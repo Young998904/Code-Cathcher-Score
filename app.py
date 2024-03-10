@@ -27,6 +27,8 @@ def execute_python_code():
 
         # 출력 비교
         result = {
+            "error": False,
+            "error_message": None,
             "input": input,
             "expected_output": expected_output,
             "actual_output": output,
@@ -41,9 +43,12 @@ def execute_python_code():
         else:
             error_message = "Unknown error"
         result = {
+            "error": True,
+            "error_message": error_message,
             "input": input,
-            "correct": False,
-            "error": error_message
+            "expected_output": expected_output,
+            "actual_output": None,
+            "correct": False
         }
     finally:
         # 임시 파일 삭제
@@ -74,12 +79,15 @@ def execute_java_code():
         filtered_errors = [error[error.find('/Main.java'):] if '/Main.java' in error else error for error in errors]
         error_message = "\n".join(filter(None, filtered_errors))
         result = {
-            "type": "compile",
+            "error": True,
+            "error_message": error_message,
+            "input": input,
+            "expected_output": expected_output,
+            "actual_output": None,
             "correct": False,
-            "error": error_message
         }
         shutil.rmtree(dir_path)  # 오류 발생 시 디렉터리 정리
-        return jsonify([result])
+        return jsonify(result)
 
     try:
         # Java 코드 실행
@@ -87,6 +95,8 @@ def execute_java_code():
         output = execute_process.stdout.strip()
 
         result = {
+            "error": False,
+            "error_message": None,
             "input": input,
             "expected_output": expected_output,
             "actual_output": output,
@@ -98,9 +108,12 @@ def execute_java_code():
         filtered_errors = [error[error.find('/Main.java'):] if '/Main.java' in error else error for error in errors]
         error_message = "\n".join(filter(None, filtered_errors))
         result = {
-            "type": "process",
+            "error": True,
+            "error_message": error_message,
+            "input": input,
+            "expected_output": expected_output,
+            "actual_output": None,
             "correct": False,
-            "error": error_message
         }
     finally:
         shutil.rmtree(dir_path)  # 작업 완료 후 디렉터리 정리
