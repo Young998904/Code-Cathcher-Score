@@ -1,4 +1,4 @@
-# Python 베이스 이미지를 지정합니다.
+# Python 및 Node.js 베이스 이미지를 지정합니다.
 FROM python:3.9.6
 
 # /app 디렉토리를 작업 디렉토리로 설정합니다.
@@ -15,6 +15,10 @@ RUN apt-get update && \
     apt-get install -y openjdk-17-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Node.js 설치
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
 
 # 환경변수 설정
 ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64

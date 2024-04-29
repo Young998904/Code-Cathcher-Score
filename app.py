@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import subprocess
 import os
 import uuid
-import shutil  # shutil 모듈 추가
+import shutil
 
 app = Flask(__name__)
 
@@ -117,6 +117,49 @@ def execute_java_code():
         }
     finally:
         shutil.rmtree(dir_path)  # 작업 완료 후 디렉터리 정리
+
+    return jsonify(result)
+@app.route('/execute/js', methods=['POST'])
+def execute_javascript_code():
+    data = request.json
+    code = data['code']  # JavaScript 코드
+    input_data = data['input']  # 입력 데이터
+    expected_output = data['output']  # 예상 출력 결과
+
+    # 임시 파일 경로 생성
+    temp_file_path = f"./temp_{uuid.uuid4()}.js"
+
+    # 코드를 임시 파일로 저장
+    with open(temp_file_path, 'w') as file:
+        file.write(code)
+
+    try:
+        # Node.js 스크립트 실행
+        process = subprocess.run(['node', temp_file_path], input=input_data, text=True, capture_output=True, check=True)
+        output = process.stdout.strip()
+
+        # 출력 비교
+        result = {
+            "error": False,
+            "error_message": None,
+            "input": input_data,
+            "expected_output": expected_output,
+            "actual_output": output,
+            "correct": output == expected_output
+        }
+    except subprocess.CalledProcessError as e:
+        error_message = e.stderr.strip() if e.stderr else "Unknown error"
+        result = {
+            "error": True,
+            "error_message": error_message,
+            "input": input_data,
+            "expected_output": expected_output,
+            "actual_output": None,
+            "correct": False
+        }
+    finally:
+        # 임시 파일 삭제
+        os.remove(temp_file_path)
 
     return jsonify(result)
 
